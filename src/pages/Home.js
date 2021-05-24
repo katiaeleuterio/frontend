@@ -11,7 +11,7 @@ class Home extends Component {
 
     constructor(props) {
         super(props);
-
+        let montante;
         this.state = {
             empresas: [],
             currentEmpresa: { id: null, nome: '', taxaJuros: '', valorEntrada: '', valorParcela: '', qtdAnos: '' },
@@ -24,7 +24,6 @@ class Home extends Component {
     }
 
     refreshEmpresaTable() {
-        debugger
         this.empresasData = api.get('/listar-todos')
             .then(response => response.data)
             .then(data => {
@@ -37,7 +36,6 @@ class Home extends Component {
     }
 
     addEmpresa = empresa => {
-        debugger
         empresa.taxaJuros = empresa.taxaJuros.replace('% ', '').replace(',', '.');
         empresa.valorEntrada = empresa.valorEntrada.replace('R$ ', '').replace(',', '.');
         empresa.valorParcela = empresa.valorParcela.replace('R$ ', '').replace(',', '.');
@@ -48,8 +46,7 @@ class Home extends Component {
     };
 
     deleteEmpresa = id => {
-        debugger
-        api.delete(`excluir/${id}`)
+        api.delete(`excluir/?id=${id}`)
             .then(res => {
                 this.refreshEmpresaTable();
             });
@@ -66,6 +63,17 @@ class Home extends Component {
         this.setState({ 
             currentEmpresa: { id: null, nome: '', taxaJuros: '', valorEntrada: '', valorParcela: '', qtdAnos: '' }
         });
+
+        this.setEditing(false);
+    };
+
+    calculaFinanciamento = (id) => {
+        
+        api.get(`calcular-valor-total-financiamento?id=${id}`)
+            .then(res => {                
+                this.montante = res.data;
+            });
+        
 
         this.setEditing(false);
     };
@@ -90,8 +98,7 @@ class Home extends Component {
         return (
             <div className="container">
                     
-                <div className="row">
-    
+                <div className="row">    
                     {
                         this.state.editing ? (
                             <div className="col s12 l6">
@@ -113,7 +120,11 @@ class Home extends Component {
                     
                     <div className="col s12 l6">
                         <h5>Empresas</h5>
-                        <EmpresaTable empresas={empresas} editRow={this.editRow} deleteEmpresa={this.deleteEmpresa} />
+                        <EmpresaTable empresas={empresas} editRow={this.editRow} deleteEmpresa={this.deleteEmpresa} calculaFinanciamento={this.calculaFinanciamento} />
+                    </div>
+                    
+                    <div className="row">
+                        <h5>O valor final do financiamento calculado é de: {this.montante}</h5>
                     </div>
                 </div>
             </div>

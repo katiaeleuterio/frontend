@@ -17,7 +17,6 @@ const AddEmpresaForm = props => {
 
         if (!empresa.nome || !empresa.valorEntrada || !empresa.valorParcela || !empresa.taxaJuros || !empresa.qtdAnos) return;
 
-        debugger
         props.addEmpresa(empresa);
         setEmpresa(initialFormState);
     };
